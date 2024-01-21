@@ -1,7 +1,7 @@
 import pickle
 
 import pandas as pd
-from flask import Flask
+from flask import Flask, render_template, request
 
 from config import Config
 
@@ -15,7 +15,7 @@ MODEL_DIR = Config.MODEL_PATH
 # This ideally should come from the app as a json input
 FAKE_DATA_INPUT = Config.FAKE_USER_TST
 
-# load our model 
+# load our model
 with open(MODEL_DIR, "rb") as f:
     online_model = pickle.load(f)
 # Creation of the Flask app
@@ -40,21 +40,49 @@ def line(Line):
 # This is where we are going to make predictions and retrain the model.
 @app.route('/prediction/<int:Line>', methods=['POST', 'GET'])
 def prediction(Line):
-    # load data
+    # First lets load data and set defaults
     file_data = pd.read_pickle(FAKE_DATA_INPUT)
-    # load model and make sure we are constantly
-    # updating it
-    global online_model  # make it accesible by other methods
-    # predict
-    pred, after_roc_score = online_model.new_entry(
-       file_data.iloc[int(Line)],
-       plot_metrics=False
-    )
+    post_data = file_data.iloc[int(Line)]
+    selected_option = None
+    user_input = 0  # by default the user does not accept the post
+    prediction_result = {}
+    new_roc = {}
 
-    return {
+    # now let's make a prediction
+    # load model and make sure we are constantly
+    # updating it by makint it a global variable
+    global online_model  # make it accesible by other methods
+    # make initial prediction
+    pred = online_model._model.predict_proba_one(post_data)
+    # get the output of the model.
+    prediction_result = {
         "PREDICTION SCORE": pred,
-        "ROC SCORE AFTER PREDICTION": str(after_roc_score)
     }
+
+    if request.method == 'POST':
+        selected_option = request.form.get('options')
+        # You can now use the selected_option for the model
+        # we pass the selection of the user to the model for learning
+        if selected_option == "accepted":
+            user_input = 1
+        online_model._return_fake_user_input = user_input
+
+        # retrain the model with user input
+        _, after_roc_score = online_model.new_entry(
+            post_data,
+            plot_metrics=False
+        )
+
+        new_roc = {
+            "ROC SCORE AFTER PREDICTION": str(after_roc_score)
+        }
+    return render_template(
+        'prediction.html',
+        selected_option=selected_option,
+        pred_result=prediction_result,
+        post_id=str(post_data.tweet_id),
+        new_roc=new_roc
+    )
 
 # API 3
 # Flask route so that we can serve HTTP traffic on that route
@@ -65,8 +93,7 @@ def prediction(Line):
 def score():
 
     return {
-        'Score Model': str(online_model._metric),
-        'Model Confusion matrix': str(online_model._confusion_matrix)
+        'ROC Score Model': str(online_model._metric),
     }
 
 

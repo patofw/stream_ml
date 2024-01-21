@@ -3,12 +3,6 @@ import json
 
 import pandas as pd
 
-from config import Config
-
-# Dir should usually come from a yml file
-# or similar, but for this exercise we keep it here
-DIR = Config.DATA_INPUT
-
 
 def read_data_input(
         path: str

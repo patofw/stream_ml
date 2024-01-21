@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accepted or Rejected</title>
+</head>
+<body>
+    <h1>Accept or Reject the post:</h1>
+
+    {% if post_id %}
+    <p>Post ID: {{ post_id }}</p>
+    {% endif %}
+
+    {% if pred_result %}
+    <p>Prediction result: {{ pred_result }}</p>
+    {% endif %}
+
+    <form method="post">
+        <input type="radio" id="accepted" name="options" value="accepted">
+        <label for="accepted">accepted</label>
+
+        <input type="radio" id="rejected" name="options" value="rejected">
+        <label for="rejected">rejected</label>
+
+        <br>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+
+    {% if selected_option %}
+    <p>The post was: {{ selected_option }}</p>
+    {% endif %}
+
+    {% if new_roc %}
+    <p>NEW ROC: {{ new_roc }}</p>
+    {% endif %}
+
+
+</body>
+</html>
