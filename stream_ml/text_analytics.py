@@ -29,9 +29,6 @@ class TextAnalytics:
             stopwords: set = set(stopwords.words('english')),
             plot_summary: bool = True,
 
-
-
-
     ) -> None:
 
         self.dataframe = dataframe.copy().reset_index(drop=True)
@@ -214,7 +211,7 @@ class TextAnalytics:
             # Plot
             nltk.FreqDist(rejected).plot(
                 20, color='darkred',
-                title='Top 20 Most Common Words in Accepted Tweets'
+                title='Top 20 Most Common Words in Rejected Tweets'
             )  # most_common(10)
 
             plt.show()
@@ -282,7 +279,7 @@ class TextAnalytics:
 if __name__ == '__main__':
     from utils import read_data_input
 
-    df = read_data_input("./data/hiring_queries")  # load data
+    df = read_data_input("./data/queries")  # load data
     # Launch The text analytics Pipeline
     txt_analytics = TextAnalytics(df)
     txt_analytics.basic_summary()

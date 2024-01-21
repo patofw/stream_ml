@@ -304,7 +304,7 @@ class OnlineTraining:
             plot_metrics: bool = True
 
     ):
-        """his is equivalent to the predict method in many ML libraries.
+        """This is equivalent to the predict method in many ML libraries.
         However, it performs a single prediction for a given
         entry in the stream.
 
@@ -364,6 +364,7 @@ class OnlineTraining:
                 )
             )
             min_value_in_dict = min(recommended.values())
+        return yi_pred, self._metric
 
     @property
     def _return_fake_user_input(self):
